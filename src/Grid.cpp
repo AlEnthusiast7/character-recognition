@@ -43,7 +43,11 @@ void Grid::DrawGrid(SDL_Renderer *renderer)
         DrawBlack(renderer, i , j);
     }
   }
+}
 
+void Grid::ClearGrid()
+{
+  std::fill(pixels.begin(), pixels.end(), 0);
 }
 
 void Grid::DrawBlack(SDL_Renderer *renderer, int row, int col)

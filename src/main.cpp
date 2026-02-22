@@ -38,12 +38,10 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     if (event->type == SDL_EVENT_QUIT) {
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     } 
-    //
-    // if (event->type == SDL_EVENT_MOUSE_BUTTON_UP || event->type == SDL_EVENT_MOUSE_BUTTON_DOWN)
-    // {
-    //   if (SDL_BUTTON_LEFT == event->button.button)
-    //     main_grid.DrawClick(renderer, event->motion.x, event->motion.y);
-    // }
+
+    if (event->type == SDL_EVENT_KEY_DOWN)
+      if (event->key.key == SDLK_C)
+        main_grid.ClearGrid();
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
