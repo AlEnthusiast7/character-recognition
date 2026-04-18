@@ -1,3 +1,4 @@
+#pragma once
 #include <mutex>
 #include <vector>
 
@@ -23,7 +24,7 @@ public:
   //  (1 - 9)
   std::vector<Matrix> predict(Matrix flattened_image_T);
 
-  void backpropagate(std::vector<Matrix> brain, int correct_label);
+  void backpropagate(std::vector<Matrix> &brain, int correct_label);
 
   // each num in layer_data corresponds to # of neurons in that layer
   // {784, 10, 9} = 784 inputs, 10 neurons in hidden layer, 9 output

@@ -24,30 +24,30 @@ MnistNetwork::MnistNetwork(std::vector<int> layer_data, float lr)
     bias.randomize();
     layer_biases.push_back(bias);
   }
-  for (auto &m : weights)
-    m.print();
 }
 
 bool MnistNetwork::train(MnistLoader &dataLoader) {
+  // lock so no other predictions can be made until training is done
+  network_mutex.lock();
+
   int count = 0;
   std::cout << "Starting training now..." << std::endl;
   while (dataLoader.training_images_read < dataLoader.number_of_images1) {
     // get image in matrix format (1, 28*28)
     Matrix image = dataLoader.read_training_image();
 
-    // gets all of the calculated neurons
-    // the brain basically
+    // gets all of the calculated neurons aka the brain
     std::vector<Matrix> brain = predict(image);
     // get the correct output for that image
     int Y = dataLoader.read_training_label();
-    network_mutex.lock();
     backpropagate(brain, Y);
-    network_mutex.unlock();
+
     ++count;
+    std::cout << "\33[2K\rImages trained on: " << count << std::flush;
   }
-  std::cout << "Finished training" << std::endl;
-  for (auto &m : weights)
-    m.print();
+  std::cout << "\nFinished training" << std::endl;
+
+  network_mutex.unlock();
   return true;
 }
 
@@ -65,7 +65,8 @@ float MnistNetwork::test(MnistLoader &dataLoader) {
   return 0.0f;
 }
 
-void MnistNetwork::backpropagate(std::vector<Matrix> brain, int correct_label) {
+void MnistNetwork::backpropagate(std::vector<Matrix> &brain,
+                                 int correct_label) {
   // C = 0.5(A-Y)**2
   // holds dC/dZ for the current neurons
   Matrix current_errors(brain.back().rows, 1);
@@ -106,15 +107,16 @@ std::vector<Matrix> MnistNetwork::predict(Matrix flattened_image_T) {
   // set up the return vector
   std::vector<Matrix> brain;
   brain.reserve((2 * weights.size()) + 1);
-  // add the first set of inputs
-  brain.push_back(flattened_image_T);
 
-  Matrix next_layer = flattened_image_T;
+  Matrix next_layer = flattened_image_T / 255.0f;
+  // add the first set of inputs
+  brain.push_back(next_layer);
+
   for (int i = 0; i < layer_biases.size(); ++i) {
     brain.push_back(weights[i]);
     next_layer = Matrix::dot(weights[i], next_layer) + layer_biases[i];
 
-    next_layer.apply(sigmoid);
+    next_layer = next_layer.apply(sigmoid);
     // append each layer of neuron
     brain.push_back(next_layer);
   }

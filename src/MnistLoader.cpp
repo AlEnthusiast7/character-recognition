@@ -62,9 +62,6 @@ MnistLoader::MnistLoader(std::string tdf1, std::string tlf1, std::string tdf2,
   training_images.read((char *)&n_cols1, sizeof(n_cols1));
   n_cols1 = reverseInt(n_cols1);
 
-  printf("\nTraining images: %i, rows: %i cols: %i", number_of_images1, n_rows1,
-         n_cols1);
-
   // check test images magic number
   magic_number = 0;
   test_images.read((char *)&magic_number, sizeof(magic_number));
@@ -89,9 +86,6 @@ MnistLoader::MnistLoader(std::string tdf1, std::string tlf1, std::string tdf2,
   n_cols2 = 0;
   test_images.read((char *)&n_cols2, sizeof(n_cols2));
   n_cols2 = reverseInt(n_cols2);
-
-  printf("\nTest images: %i, rows: %i cols: %i\n", number_of_images2, n_rows2,
-         n_cols2);
 }
 
 // reverses the order of bytes in i
@@ -142,8 +136,6 @@ Matrix MnistLoader::read_image(std::ifstream &images, int rows, int cols) {
   image = image.flatten();
   // transpose to (28^2, 1)
   image = image.transpose();
-  // normalize
-  image = image / 255.0f;
 
   return image;
 }

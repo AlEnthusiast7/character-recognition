@@ -19,8 +19,8 @@ MnistLoader ld("../assets/train-images.idx3-ubyte",
                "../assets/t10k-images.idx3-ubyte",
                "../assets/t10k-labels.idx1-ubyte");
 
-std::vector<int> layer_data = {784, 10, 10};
-MnistNetwork cnn(layer_data, 0.001f);
+std::vector<int> layer_data = {784, 128, 128, 10};
+MnistNetwork nn(layer_data, 0.05f);
 Grid main_grid(28, 28, screen_w, screen_h);
 
 /* This function runs once at startup. */
@@ -42,7 +42,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   SDL_SetRenderLogicalPresentation(renderer, screen_w, screen_h,
                                    SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-  std::thread t1(&MnistNetwork::train, &cnn, std::ref(ld));
+  std::thread t1(&MnistNetwork::train, &nn, std::ref(ld));
   t1.detach();
 
   return SDL_APP_CONTINUE; /* carry on with the program! */
@@ -57,12 +57,11 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
   if (event->type == SDL_EVENT_KEY_DOWN)
     if (event->key.key == SDLK_C)
       main_grid.ClearGrid();
-  if (event->key.key == SDLK_RETURN) {
-    Matrix image = main_grid.get_flattened_grid().transpose() / 255.0f;
-    image.print();
-    cnn.network_mutex.lock();
-    std::vector<Matrix> brain = cnn.predict(image);
-    cnn.network_mutex.unlock();
+  if (event->key.key == SDLK_RETURN && nn.network_mutex.try_lock()) {
+    Matrix image = main_grid.get_flattened_grid().transpose();
+
+    std::vector<Matrix> brain = nn.predict(image);
+    nn.network_mutex.unlock();
     Matrix output = brain.back();
 
     int o = 0;
