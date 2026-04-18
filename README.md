@@ -11,8 +11,6 @@ mkdir build
 
 Run cmake and make from inside the build folder
 ```
-```
-```
 cd build
 cmake ..
 make
