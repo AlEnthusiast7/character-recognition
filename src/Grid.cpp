@@ -1,6 +1,5 @@
 #include "Grid.h"
 #include <SDL3/SDL.h>
-#include <iostream>
 #include <math.h>
 
 Grid::Grid(int size_x, int size_y, int screen_width, int screen_height)

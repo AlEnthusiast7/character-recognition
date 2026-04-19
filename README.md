@@ -24,5 +24,3 @@ Run the program
 ```
 ./CR
 ```
-```
-```
