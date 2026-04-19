@@ -35,6 +35,9 @@ public:
   // randomize the values in the matrix
   void randomize();
 
+  // He weight init
+  void He_randomize(float n);
+
   // flattens the matrix into shape (1, rows*cols)
   Matrix flatten();
 

@@ -16,7 +16,7 @@ public:
   std::vector<Matrix> weights;
 
   // trains the model
-  bool train(MnistLoader &dataLoader);
+  bool train(MnistLoader &dataLoader, int epochs);
   // Tests the model and returns accuracy rate
   float test(MnistLoader &dataLoader);
 
@@ -27,6 +27,9 @@ public:
   void backpropagate(std::vector<Matrix> &brain, int correct_label);
 
   // each num in layer_data corresponds to # of neurons in that layer
-  // {784, 10, 9} = 784 inputs, 10 neurons in hidden layer, 9 output
+  // {784, 10, 10} = 784 inputs, 10 neurons in hidden layer, 10 output
   MnistNetwork(std::vector<int> layer_data, float lr = 0.01f);
+
+  void backpropagate_mse(std::vector<Matrix> &brain, int correct_label);
+  std::vector<Matrix> predict_sigmoid(Matrix flattened_image_T);
 };

@@ -7,8 +7,28 @@ MnistLoader::MnistLoader(std::string tdf1, std::string tlf1, std::string tdf2,
       // ios::binary is needed for windows machines
       // to interpret binary data correctly
       test_images(tdf2, std::ios::binary), test_labels(tlf2, std::ios::binary),
-      //
       test_images_read(0), training_images_read(0) {
+  verify();
+}
+
+bool MnistLoader::verify() {
+  // reset attributes
+  training_images_read = number_of_images1 = n_rows1 = n_cols1 = 0;
+  test_images_read = number_of_images2 = n_rows2 = n_cols2 = 0;
+
+  // reset the cursors
+  training_images.seekg(0, std::ios::beg);
+  training_labels.seekg(0, std::ios::beg);
+  test_images.seekg(0, std::ios::beg);
+  test_labels.seekg(0, std::ios::beg);
+
+  if (!(check_train_magic() && check_test_magic())) {
+    return false;
+  }
+  return true;
+}
+
+bool MnistLoader::check_train_magic() {
   // check training labels magic number
   int magic_number = 0;
   training_labels.read((char *)&magic_number, sizeof(magic_number));
@@ -17,25 +37,12 @@ MnistLoader::MnistLoader(std::string tdf1, std::string tlf1, std::string tdf2,
   if (magic_number != 2049) {
     throw std::runtime_error(
         "Magic number mismatch for training_labels, expecting 2049");
+    return false;
   }
 
   // read # of labels to move cursor
   int num_labels = 0;
   training_labels.read((char *)&num_labels, sizeof(num_labels));
-
-  // check test labels magic number
-  magic_number = 0;
-  test_labels.read((char *)&magic_number, sizeof(magic_number));
-  magic_number = reverseInt(magic_number);
-
-  if (magic_number != 2049) {
-    throw std::runtime_error(
-        "Magic number mismatch for test_labels, expecting 2049");
-  }
-
-  // read # of labels to move cursor
-  num_labels = 0;
-  test_labels.read((char *)&num_labels, sizeof(num_labels));
 
   // check training images magic number
   magic_number = 0;
@@ -45,6 +52,7 @@ MnistLoader::MnistLoader(std::string tdf1, std::string tlf1, std::string tdf2,
   if (magic_number != 2051) {
     throw std::runtime_error(
         "Magic number mismatch for training_images, expecting 2051");
+    return false;
   }
 
   // get number of images
@@ -62,6 +70,25 @@ MnistLoader::MnistLoader(std::string tdf1, std::string tlf1, std::string tdf2,
   training_images.read((char *)&n_cols1, sizeof(n_cols1));
   n_cols1 = reverseInt(n_cols1);
 
+  return true;
+}
+
+bool MnistLoader::check_test_magic() {
+  // check test labels magic number
+  int magic_number = 0;
+  test_labels.read((char *)&magic_number, sizeof(magic_number));
+  magic_number = reverseInt(magic_number);
+
+  if (magic_number != 2049) {
+    throw std::runtime_error(
+        "Magic number mismatch for test_labels, expecting 2049");
+    return false;
+  }
+
+  // read # of labels to move cursor
+  int num_labels = 0;
+  test_labels.read((char *)&num_labels, sizeof(num_labels));
+
   // check test images magic number
   magic_number = 0;
   test_images.read((char *)&magic_number, sizeof(magic_number));
@@ -70,6 +97,7 @@ MnistLoader::MnistLoader(std::string tdf1, std::string tlf1, std::string tdf2,
   if (magic_number != 2051) {
     throw std::runtime_error(
         "Magic number mismatch for test_images, expecting 2051");
+    return false;
   }
 
   // get number of images
@@ -86,6 +114,8 @@ MnistLoader::MnistLoader(std::string tdf1, std::string tlf1, std::string tdf2,
   n_cols2 = 0;
   test_images.read((char *)&n_cols2, sizeof(n_cols2));
   n_cols2 = reverseInt(n_cols2);
+
+  return true;
 }
 
 // reverses the order of bytes in i

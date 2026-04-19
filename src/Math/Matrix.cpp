@@ -1,4 +1,5 @@
 #include "Matrix.h"
+#include <cmath>
 #include <iostream>
 #include <random>
 
@@ -112,7 +113,18 @@ void Matrix::randomize() {
   // randome device is slow, need to use an alg
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_real_distribution<float> dist(-0.08f, 0.08f);
+  std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+  for (auto &i : data) {
+    i = dist(gen);
+  }
+}
+
+void Matrix::He_randomize(float n) {
+  // seed to start
+  // randome device is slow, need to use an alg
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::normal_distribution<float> dist(0.0f, std::sqrt(2.0f / n));
   for (auto &i : data) {
     i = dist(gen);
   }

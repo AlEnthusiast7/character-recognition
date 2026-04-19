@@ -19,8 +19,8 @@ MnistLoader ld("../assets/train-images.idx3-ubyte",
                "../assets/t10k-images.idx3-ubyte",
                "../assets/t10k-labels.idx1-ubyte");
 
-std::vector<int> layer_data = {784, 128, 128, 10};
-MnistNetwork nn(layer_data, 0.05f);
+std::vector<int> layer_data = {784, 64, 10};
+MnistNetwork nn(layer_data, 0.01f);
 Grid main_grid(28, 28, screen_w, screen_h);
 
 /* This function runs once at startup. */
@@ -42,7 +42,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   SDL_SetRenderLogicalPresentation(renderer, screen_w, screen_h,
                                    SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-  std::thread t1(&MnistNetwork::train, &nn, std::ref(ld));
+  std::thread t1(&MnistNetwork::train, &nn, std::ref(ld), 3);
   t1.detach();
 
   return SDL_APP_CONTINUE; /* carry on with the program! */

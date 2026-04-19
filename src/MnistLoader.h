@@ -30,6 +30,14 @@ public:
               std::string training_labels_filepath,
               std::string test_data_filepath, std::string test_labels_filepath);
 
+  // verifies all data and labels
+  //  checks magic numbers etc
+  bool verify();
+
+  // checks the training and testing magic numbers
+  bool check_train_magic();
+  bool check_test_magic();
+
   // get next image/label
   Matrix read_training_image();
   int read_training_label();
